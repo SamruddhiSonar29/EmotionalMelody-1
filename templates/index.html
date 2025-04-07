@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emotion-Based Music Recommender</title>
+    <title>MoodMuse - Emotion-Based Music Recommender</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
@@ -11,87 +11,251 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    <!-- Gradient Background Overlay -->
+    <div class="background-gradient"></div>
+    
     <!-- Header -->
-    <header class="py-3 mb-4 border-bottom">
-        <div class="container d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-music me-2 text-primary fs-4"></i>
-                <span class="fs-4">Emotion-Based Music Recommender</span>
-            </div>
-            <div>
-                <span class="badge bg-secondary">v1.0</span>
+    <header class="header-section">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between py-3">
+                <div class="d-flex align-items-center">
+                    <div class="logo-container me-3">
+                        <i class="fas fa-headphones-alt logo-icon"></i>
+                    </div>
+                    <div>
+                        <h1 class="app-title mb-0">MoodMuse</h1>
+                        <p class="app-subtitle mb-0">Music that matches your mood</p>
+                    </div>
+                </div>
+                <div class="emotion-display" id="emotion-display">
+                    <div class="emotion-icon neutral-icon" id="emotion-icon"></div>
+                    <span id="detected-emotion-header">Neutral</span>
+                </div>
             </div>
         </div>
     </header>
     
     <main class="container py-4">
-        <div class="row">
-            <div class="col-12 text-center mb-4">
-                <h2>Let your emotions choose the music</h2>
-                <p class="lead text-muted">Using AI to detect your mood and recommend the perfect track</p>
+        <div class="hero-section text-center mb-5">
+            <h2 class="hero-title"><span class="gradient-text">Let Your Emotions</span> Choose the Music</h2>
+            <p class="hero-subtitle">Our AI detects your mood and plays the perfect soundtrack for your feelings</p>
+            <div class="language-toggle-container mt-3">
+                <button id="toggle-language" class="btn language-toggle-btn">
+                    <i class="fas fa-globe me-2"></i>
+                    <span class="language-label">English</span>
+                    <i class="fas fa-exchange-alt mx-2"></i>
+                    <span class="language-label secondary">हिंदी</span>
+                </button>
             </div>
         </div>
         
-        <div class="row g-4">
+        <div class="row g-4 main-content">
             <!-- Webcam and Controls Column -->
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-header bg-dark">
+            <div class="col-lg-7">
+                <div class="camera-card">
+                    <div class="camera-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-camera me-2"></i> Webcam Feed</span>
-                            <span class="badge bg-danger" id="status-indicator">Inactive</span>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-video me-2"></i>
+                                <span>Live Camera Feed</span>
+                            </div>
+                            <div class="detection-status">
+                                <span class="status-dot" id="status-dot"></span>
+                                <span class="status-text" id="status-indicator">Inactive</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <!-- Webcam Feed -->
+                    
+                    <div class="camera-body">
+                        <!-- Webcam Feed with animated overlay -->
                         <div class="webcam-container">
-                            <img src="{{ url_for('video_feed') }}" alt="Webcam Feed">
+                            <div class="webcam-overlay">
+                                <div class="overlay-corner tl"></div>
+                                <div class="overlay-corner tr"></div>
+                                <div class="overlay-corner bl"></div>
+                                <div class="overlay-corner br"></div>
+                                <div class="scan-line"></div>
+                            </div>
+                            <img src="{{ url_for('video_feed') }}" alt="Webcam Feed" class="webcam-feed">
+                            
+                            <!-- Emotion indicator overlay -->
+                            <div class="emotion-bubble" id="emotion-bubble">
+                                <i class="fas fa-smile emotion-bubble-icon"></i>
+                                <span class="emotion-bubble-text" id="emotion-bubble-text">Neutral</span>
+                            </div>
                         </div>
                         
                         <!-- Detection Controls -->
-                        <div class="detection-controls mt-3">
-                            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center">
-                                <button id="start-detection" class="btn btn-primary mb-2 mb-sm-0">
-                                    <i class="fas fa-play-circle me-2"></i> Start Detection
-                                </button>
-                                <button id="toggle-language" class="btn btn-language">
-                                    <i class="fas fa-language me-2"></i> Switch to Hindi
-                                </button>
+                        <div class="controls-container">
+                            <button id="start-detection" class="btn detection-btn">
+                                <div class="btn-content">
+                                    <i class="fas fa-play-circle me-2"></i>
+                                    <span>Start Detection</span>
+                                </div>
+                                <div class="btn-hover-effect"></div>
+                            </button>
+                            
+                            <div class="emotion-pills">
+                                <div class="emotion-pill" data-emotion="happy">
+                                    <i class="fas fa-smile"></i>
+                                    <span>Happy</span>
+                                </div>
+                                <div class="emotion-pill" data-emotion="sad">
+                                    <i class="fas fa-sad-tear"></i>
+                                    <span>Sad</span>
+                                </div>
+                                <div class="emotion-pill" data-emotion="angry">
+                                    <i class="fas fa-angry"></i>
+                                    <span>Angry</span>
+                                </div>
+                                <div class="emotion-pill" data-emotion="surprise">
+                                    <i class="fas fa-surprise"></i>
+                                    <span>Surprise</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- How it Works Section (now below camera on mobile) -->
+                <div class="how-it-works mt-4 d-lg-none">
+                    <h3 class="section-title">How It Works</h3>
+                    <div class="process-steps">
+                        <div class="process-step">
+                            <div class="step-icon">
+                                <i class="fas fa-camera"></i>
+                                <div class="step-number">1</div>
+                            </div>
+                            <div class="step-content">
+                                <h4>Capture</h4>
+                                <p>Our app captures your facial expressions in real-time</p>
+                            </div>
+                        </div>
+                        
+                        <div class="process-step">
+                            <div class="step-icon">
+                                <i class="fas fa-brain"></i>
+                                <div class="step-number">2</div>
+                            </div>
+                            <div class="step-content">
+                                <h4>Analyze</h4>
+                                <p>AI algorithms detect your emotional state</p>
+                            </div>
+                        </div>
+                        
+                        <div class="process-step">
+                            <div class="step-icon">
+                                <i class="fas fa-music"></i>
+                                <div class="step-number">3</div>
+                            </div>
+                            <div class="step-content">
+                                <h4>Play</h4>
+                                <p>We deliver music that resonates with your mood</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Emotion and Music Column -->
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-header bg-dark">
+            <!-- Music Player Section -->
+            <div class="col-lg-5">
+                <div class="music-card">
+                    <div class="music-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-headphones me-2"></i> Music Recommendation</span>
-                            <div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-music me-2"></i>
+                                <span>Music Recommendation</span>
+                            </div>
+                            <div class="current-emotion">
                                 <i class="fas fa-heart-pulse me-1"></i>
                                 <span id="detected-emotion">Neutral</span>
                             </div>
                         </div>
                     </div>
-                    <div class="card-body d-flex flex-column">
-                        <!-- Song Information -->
-                        <div class="song-info mb-3">
-                            <h4 class="mb-0">Current Song</h4>
-                            <div class="song-title" id="song-title">Not playing</div>
-                            <div class="song-artist" id="song-artist">Start detection to get recommendations</div>
+                    
+                    <div class="music-body">
+                        <!-- Song Information with album art placeholder -->
+                        <div class="current-track">
+                            <div class="album-art">
+                                <div class="album-art-placeholder">
+                                    <i class="fas fa-music"></i>
+                                </div>
+                            </div>
+                            <div class="track-info">
+                                <h3 class="track-title" id="song-title">Not playing</h3>
+                                <p class="track-artist" id="song-artist">Start detection to get recommendations</p>
+                                <div class="track-emotion">
+                                    <span class="emotion-tag" id="track-emotion-tag">Neutral</span>
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- YouTube Player -->
-                        <div class="player-container flex-grow-1" id="youtube-player">
-                            <div class="text-center p-5">
-                                <i class="fas fa-music fs-1 mb-3 text-muted"></i>
-                                <p class="text-muted">Music player will appear here when a song is recommended</p>
+                        <div class="player-container" id="youtube-player">
+                            <div class="player-placeholder">
+                                <div class="placeholder-icon">
+                                    <i class="fas fa-headphones-alt"></i>
+                                </div>
+                                <p class="placeholder-text">Your music will appear here</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Music Controls (visual only) -->
+                        <div class="music-controls">
+                            <button class="control-btn">
+                                <i class="fas fa-step-backward"></i>
+                            </button>
+                            <button class="control-btn control-btn-primary">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <button class="control-btn">
+                                <i class="fas fa-step-forward"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- How it Works Section (desktop view) -->
+                <div class="how-it-works mt-4 d-none d-lg-block">
+                    <h3 class="section-title">How It Works</h3>
+                    <div class="process-steps">
+                        <div class="process-step">
+                            <div class="step-icon">
+                                <i class="fas fa-camera"></i>
+                                <div class="step-number">1</div>
+                            </div>
+                            <div class="step-content">
+                                <h4>Capture</h4>
+                                <p>Our app captures your facial expressions in real-time</p>
+                            </div>
+                        </div>
+                        
+                        <div class="process-step">
+                            <div class="step-icon">
+                                <i class="fas fa-brain"></i>
+                                <div class="step-number">2</div>
+                            </div>
+                            <div class="step-content">
+                                <h4>Analyze</h4>
+                                <p>AI algorithms detect your emotional state</p>
+                            </div>
+                        </div>
+                        
+                        <div class="process-step">
+                            <div class="step-icon">
+                                <i class="fas fa-music"></i>
+                                <div class="step-number">3</div>
+                            </div>
+                            <div class="step-content">
+                                <h4>Play</h4>
+                                <p>We deliver music that resonates with your mood</p>
                             </div>
                         </div>
                     </div>
@@ -99,112 +263,78 @@
             </div>
         </div>
         
-        <!-- How it Works Section -->
-        <div class="row mt-5">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-dark">
-                        <i class="fas fa-info-circle me-2"></i> How It Works
+        <!-- Emotions Showcase -->
+        <div class="emotions-showcase mt-5">
+            <h3 class="section-title text-center mb-4">Emotion Spectrum</h3>
+            <div class="emotion-cards">
+                <div class="emotion-card happy">
+                    <div class="emotion-card-icon">
+                        <i class="fas fa-smile"></i>
                     </div>
-                    <div class="card-body">
-                        <div class="row g-4">
-                            <div class="col-md-4">
-                                <div class="text-center mb-3">
-                                    <i class="fas fa-camera fs-1 text-primary"></i>
-                                </div>
-                                <h5 class="text-center">1. Capture</h5>
-                                <p class="text-center">Your webcam captures your facial expressions in real-time</p>
-                            </div>
-                            
-                            <div class="col-md-4">
-                                <div class="text-center mb-3">
-                                    <i class="fas fa-brain fs-1 text-primary"></i>
-                                </div>
-                                <h5 class="text-center">2. Analyze</h5>
-                                <p class="text-center">Our AI model analyzes your expression to determine your emotion</p>
-                            </div>
-                            
-                            <div class="col-md-4">
-                                <div class="text-center mb-3">
-                                    <i class="fas fa-music fs-1 text-primary"></i>
-                                </div>
-                                <h5 class="text-center">3. Recommend</h5>
-                                <p class="text-center">We recommend and play music that matches your emotional state</p>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="emotion-card-label">Happy</div>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Emotions Guide -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-dark">
-                        <i class="fas fa-heart-pulse me-2"></i> Emotion Guide
+                <div class="emotion-card sad">
+                    <div class="emotion-card-icon">
+                        <i class="fas fa-sad-tear"></i>
                     </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-6 col-md-3">
-                                <div class="d-flex align-items-center">
-                                    <span class="emotion-happy me-2">●</span>
-                                    <span>Happy</span>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <div class="d-flex align-items-center">
-                                    <span class="emotion-sad me-2">●</span>
-                                    <span>Sad</span>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <div class="d-flex align-items-center">
-                                    <span class="emotion-angry me-2">●</span>
-                                    <span>Angry</span>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <div class="d-flex align-items-center">
-                                    <span class="emotion-neutral me-2">●</span>
-                                    <span>Neutral</span>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <div class="d-flex align-items-center">
-                                    <span class="emotion-surprise me-2">●</span>
-                                    <span>Surprise</span>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <div class="d-flex align-items-center">
-                                    <span class="emotion-fear me-2">●</span>
-                                    <span>Fear</span>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <div class="d-flex align-items-center">
-                                    <span class="emotion-disgust me-2">●</span>
-                                    <span>Disgust</span>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="emotion-card-label">Sad</div>
+                </div>
+                <div class="emotion-card angry">
+                    <div class="emotion-card-icon">
+                        <i class="fas fa-angry"></i>
                     </div>
+                    <div class="emotion-card-label">Angry</div>
+                </div>
+                <div class="emotion-card neutral">
+                    <div class="emotion-card-icon">
+                        <i class="fas fa-meh"></i>
+                    </div>
+                    <div class="emotion-card-label">Neutral</div>
+                </div>
+                <div class="emotion-card surprise">
+                    <div class="emotion-card-icon">
+                        <i class="fas fa-surprise"></i>
+                    </div>
+                    <div class="emotion-card-label">Surprise</div>
+                </div>
+                <div class="emotion-card fear">
+                    <div class="emotion-card-icon">
+                        <i class="fas fa-grimace"></i>
+                    </div>
+                    <div class="emotion-card-label">Fear</div>
+                </div>
+                <div class="emotion-card disgust">
+                    <div class="emotion-card-icon">
+                        <i class="fas fa-dizzy"></i>
+                    </div>
+                    <div class="emotion-card-label">Disgust</div>
                 </div>
             </div>
         </div>
     </main>
     
     <!-- Footer -->
-    <footer class="py-3 mt-4 border-top">
-        <div class="container text-center">
-            <p class="text-muted mb-0">
-                <small>
-                    Emotion-Based Music Recommender © 2023
-                    <br>
-                    Made with <i class="fas fa-heart text-danger"></i> using Python, OpenCV, TensorFlow & Flask
-                </small>
-            </p>
+    <footer class="app-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-branding">
+                    <h2 class="footer-title">MoodMuse</h2>
+                    <p class="footer-tagline">Your emotions, your music</p>
+                </div>
+                <div class="footer-tech">
+                    <p>Powered by</p>
+                    <div class="tech-stack">
+                        <span class="tech-badge">Python</span>
+                        <span class="tech-badge">TensorFlow</span>
+                        <span class="tech-badge">OpenCV</span>
+                        <span class="tech-badge">Flask</span>
+                    </div>
+                </div>
+                <div class="footer-copyright">
+                    <p>&copy; 2025 MoodMuse</p>
+                    <p>All rights reserved</p>
+                </div>
+            </div>
         </div>
     </footer>
     
