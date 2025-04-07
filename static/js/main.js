@@ -67,11 +67,11 @@ function setupEventListeners() {
         });
     });
     
-    // Emotion cards
+    // Emotion cards - reducing animations for better performance
     const emotionCards = document.querySelectorAll('.emotion-card');
     emotionCards.forEach(card => {
         card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-10px) scale(1.05)';
+            this.style.transform = 'translateY(-5px)';
         });
         
         card.addEventListener('mouseleave', function() {
@@ -80,22 +80,28 @@ function setupEventListeners() {
     });
 }
 
-// Animate UI elements
+// Animate UI elements - optimized for performance
 function animateUI() {
     frameCount++;
     
-    // Pulse effect for active status dot
-    const statusDot = document.querySelector('.status-dot.active');
-    if (statusDot) {
-        const pulseIntensity = Math.sin(frameCount * 0.05) * 0.3 + 0.7;
-        statusDot.style.opacity = pulseIntensity;
-    }
-    
-    // Subtle floating animation for emotion display
-    const emotionDisplay = document.getElementById('emotion-display');
-    if (emotionDisplay) {
-        const floatOffset = Math.sin(frameCount * 0.02) * 3;
-        emotionDisplay.style.transform = `translateY(${floatOffset}px)`;
+    // Only run animations every other frame to improve performance
+    if (frameCount % 2 === 0) {
+        // Pulse effect for active status dot
+        const statusDot = document.querySelector('.status-dot.active');
+        if (statusDot) {
+            const pulseIntensity = Math.sin(frameCount * 0.05) * 0.3 + 0.7;
+            statusDot.style.opacity = pulseIntensity;
+        }
+        
+        // Subtle floating animation for emotion display - only run this animation
+        // at a reduced frequency (every 4 frames)
+        if (frameCount % 4 === 0) {
+            const emotionDisplay = document.getElementById('emotion-display');
+            if (emotionDisplay) {
+                const floatOffset = Math.sin(frameCount * 0.01) * 2;
+                emotionDisplay.style.transform = `translateY(${floatOffset}px)`;
+            }
+        }
     }
     
     // Continue animation loop
@@ -120,8 +126,8 @@ function toggleEmotionDetection() {
         statusIndicator.classList.add('active');
         statusDot.classList.add('active');
         
-        // Start periodic emotion detection
-        emotionDetectionInterval = setInterval(detectEmotion, 5000); // Every 5 seconds
+        // Start periodic emotion detection - reduced frequency
+        emotionDetectionInterval = setInterval(detectEmotion, 7000); // Reduced from 5s to 7s
         
         // Do an immediate detection
         detectEmotion();
@@ -223,13 +229,13 @@ function detectEmotion() {
 
 // Create a visual effect when selecting emotions in the UI
 function animateEmotionSelection(emotion) {
-    // Flash effect on the webcam overlay
+    // Simplified effect for better performance
     const overlay = document.querySelector('.webcam-overlay');
     if (overlay) {
-        overlay.style.boxShadow = 'inset 0 0 20px rgba(140, 82, 255, 0.8)';
+        overlay.style.boxShadow = 'inset 0 0 10px rgba(140, 82, 255, 0.6)';
         setTimeout(() => {
             overlay.style.boxShadow = 'none';
-        }, 300);
+        }, 200);
     }
     
     // Update emoji bubble with the selected emotion
@@ -241,7 +247,7 @@ function updateEmotionDisplay(emotion) {
     // Update the main emotion display
     const capitalizedEmotion = emotion.charAt(0).toUpperCase() + emotion.slice(1);
     
-    // Update all instances of emotion display
+    // Update text elements - simplifying to improve performance
     document.getElementById('detected-emotion').textContent = capitalizedEmotion;
     document.getElementById('detected-emotion-header').textContent = capitalizedEmotion;
     document.getElementById('track-emotion-tag').textContent = capitalizedEmotion;
@@ -257,19 +263,6 @@ function updateEmotionDisplay(emotion) {
     
     // Update emotion bubble
     updateEmotionBubble(emotion);
-    
-    // Visually highlight the matching emotion card
-    const emotionCards = document.querySelectorAll('.emotion-card');
-    emotionCards.forEach(card => {
-        if (card.classList.contains(emotion.toLowerCase())) {
-            card.style.transform = 'translateY(-10px) scale(1.1)';
-            card.style.boxShadow = '0 15px 25px rgba(0, 0, 0, 0.3)';
-            setTimeout(() => {
-                card.style.transform = '';
-                card.style.boxShadow = '';
-            }, 1000);
-        }
-    });
 }
 
 // Update the emotion bubble overlay on the webcam
@@ -319,12 +312,6 @@ function updateEmotionBubble(emotion) {
                 emotionBubbleIcon.classList.add('fas', 'fa-smile');
                 emotionBubble.style.borderColor = 'rgba(255, 255, 255, 0.1)';
         }
-        
-        // Add animation effect
-        emotionBubble.classList.add('bubble-pulse');
-        setTimeout(() => {
-            emotionBubble.classList.remove('bubble-pulse');
-        }, 500);
     }
 }
 
@@ -336,23 +323,9 @@ function displaySong(song) {
     const emotionTag = document.getElementById('track-emotion-tag');
     
     if (songTitle && songArtist) {
-        // Apply a slide-in animation effect
-        songTitle.style.opacity = '0';
-        songTitle.style.transform = 'translateY(-10px)';
-        songArtist.style.opacity = '0';
-        songArtist.style.transform = 'translateY(-10px)';
-        
-        // Update content after a short delay for animation
-        setTimeout(() => {
-            songTitle.textContent = song.title;
-            songArtist.textContent = song.artist;
-            
-            // Fade back in
-            songTitle.style.opacity = '1';
-            songTitle.style.transform = 'translateY(0)';
-            songArtist.style.opacity = '1';
-            songArtist.style.transform = 'translateY(0)';
-        }, 200);
+        // Simplified animation
+        songTitle.textContent = song.title;
+        songArtist.textContent = song.artist;
     }
     
     // Update emotion tag if available
@@ -360,16 +333,10 @@ function displaySong(song) {
         emotionTag.textContent = languageToggle.charAt(0).toUpperCase() + languageToggle.slice(1);
     }
     
-    // Update the YouTube player
+    // Update the YouTube player - simplified for better performance
     if (playerContainer && song.youtube_id) {
         // Create a placeholder before the real player loads
-        const placeholderHtml = `
-            <div class="player-loading">
-                <div class="loading-spinner"></div>
-                <p>Loading music...</p>
-            </div>
-        `;
-        playerContainer.innerHTML = placeholderHtml;
+        playerContainer.innerHTML = '<div class="player-loading"><div class="loading-spinner"></div><p>Loading music...</p></div>';
         
         // After a slight delay, create the real player
         setTimeout(() => {
@@ -386,38 +353,13 @@ function displaySong(song) {
             // Clear the container and add the iframe
             playerContainer.innerHTML = '';
             playerContainer.appendChild(iframe);
-            
-            // Add a slight animation to the controls
-            const controls = document.querySelector('.music-controls');
-            if (controls) {
-                controls.classList.add('controls-active');
-                setTimeout(() => {
-                    controls.classList.remove('controls-active');
-                }, 1000);
-            }
         }, 800);
     }
 }
 
-// Add these CSS animations
+// Add simpler CSS animations
 const style = document.createElement('style');
 style.textContent = `
-@keyframes bubble-pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
-}
-
-@keyframes controls-active {
-    0% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-    100% { transform: translateY(0); }
-}
-
-.controls-active {
-    animation: controls-active 0.5s ease;
-}
-
 .loading-spinner {
     width: 40px;
     height: 40px;
@@ -440,10 +382,6 @@ style.textContent = `
     justify-content: center;
     height: 100%;
     color: var(--text-secondary);
-}
-
-.track-title, .track-artist {
-    transition: all 0.3s ease;
 }
 `;
 document.head.appendChild(style);
