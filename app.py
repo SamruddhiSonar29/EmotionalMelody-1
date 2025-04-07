@@ -1,7 +1,7 @@
 import os
 import logging
 import random
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, redirect, url_for
 from emotion_detector import EmotionDetector
 from music_recommender import MusicRecommender
 
@@ -27,6 +27,12 @@ current_song = None
 def index():
     """Render the main page"""
     return render_template('index.html')
+
+# Added to prevent 404 errors if there are any legacy references to video_feed
+@app.route('/video_feed')
+def video_feed():
+    """Redirect to index if this endpoint is called"""
+    return redirect(url_for('index'))
 
 @app.route('/detect_emotion', methods=['POST'])
 def detect_emotion():
@@ -61,11 +67,17 @@ def set_emotion():
     global detected_emotion, current_song, current_language
     
     emotion = request.json.get('emotion', 'neutral')
-    detected_emotion = emotion
+    language = request.json.get('language', current_language)
+    current_language = language
+    
+    # Use the new manual emotion setter method
+    detected_emotion = emotion_detector.set_manual_emotion(emotion)
     
     # Update the song recommendation
     song = music_recommender.recommend_song(detected_emotion, current_language)
     current_song = song
+    
+    logger.info(f"Emotion manually set to {detected_emotion}, recommending {song['title'] if song else 'no song'}")
     
     return jsonify({
         'emotion': detected_emotion,

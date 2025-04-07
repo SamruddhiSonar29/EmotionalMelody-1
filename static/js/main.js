@@ -8,7 +8,7 @@ let frameCount = 0;
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Document loaded, initializing application...');
     
-    // Initialize webcam and emotion detection
+    // Initialize app and emotion selection
     initializeApp();
     
     // Setup event listeners
@@ -58,24 +58,31 @@ function setupEventListeners() {
         toggleLanguageBtn.addEventListener('click', toggleLanguage);
     }
     
-    // Emotion pill buttons (just for visual effect in the UI)
+    // Emotion pill buttons - now these will actually set the emotion
     const emotionPills = document.querySelectorAll('.emotion-pill');
     emotionPills.forEach(pill => {
         pill.addEventListener('click', function() {
             const emotion = this.getAttribute('data-emotion');
-            animateEmotionSelection(emotion);
+            setEmotionManually(emotion);
         });
     });
     
-    // Emotion cards - reducing animations for better performance
+    // Emotion cards - now these will actually set the emotion
     const emotionCards = document.querySelectorAll('.emotion-card');
     emotionCards.forEach(card => {
+        // Visual effect on hover
         card.addEventListener('mouseenter', function() {
             this.style.transform = 'translateY(-5px)';
         });
         
         card.addEventListener('mouseleave', function() {
             this.style.transform = '';
+        });
+        
+        // Set emotion on click
+        card.addEventListener('click', function() {
+            const emotion = this.classList[1]; // The second class is the emotion name
+            setEmotionManually(emotion);
         });
     });
 }
@@ -108,7 +115,7 @@ function animateUI() {
     requestAnimationFrame(animateUI);
 }
 
-// Toggle emotion detection on/off
+// Toggle emotion detection on/off (auto or manual)
 function toggleEmotionDetection() {
     const startBtn = document.getElementById('start-detection');
     const statusIndicator = document.getElementById('status-indicator');
@@ -116,33 +123,58 @@ function toggleEmotionDetection() {
     
     if (!emotionDetectionInterval) {
         // Start emotion detection
-        startBtn.querySelector('span').textContent = 'Stop Detection';
+        startBtn.querySelector('span').textContent = 'Stop Auto Detection';
         startBtn.querySelector('i').classList.remove('fa-play-circle');
         startBtn.querySelector('i').classList.add('fa-stop-circle');
         startBtn.classList.add('active');
         
         // Update status indicator
-        statusIndicator.textContent = 'Active';
+        statusIndicator.textContent = 'Auto Mode';
         statusIndicator.classList.add('active');
         statusDot.classList.add('active');
         
-        // Start periodic emotion detection - reduced frequency
-        emotionDetectionInterval = setInterval(detectEmotion, 7000); // Reduced from 5s to 7s
+        // Add active class to emotion cards
+        document.querySelectorAll('.emotion-card, .emotion-pill').forEach(el => {
+            el.classList.add('auto-mode');
+        });
+        
+        // Add helper text
+        const emotionCardsContainer = document.querySelector('.emotions-showcase');
+        if (emotionCardsContainer && !document.querySelector('.auto-mode-notice')) {
+            const notice = document.createElement('div');
+            notice.className = 'auto-mode-notice';
+            notice.innerHTML = '<p>Auto-detection is active. You can still click on emotions to manually select them.</p>';
+            emotionCardsContainer.prepend(notice);
+        }
+        
+        // Start periodic emotion detection
+        emotionDetectionInterval = setInterval(detectEmotion, 7000);
         
         // Do an immediate detection
         detectEmotion();
         
     } else {
         // Stop emotion detection
-        startBtn.querySelector('span').textContent = 'Start Detection';
+        startBtn.querySelector('span').textContent = 'Start Auto Detection';
         startBtn.querySelector('i').classList.remove('fa-stop-circle');
         startBtn.querySelector('i').classList.add('fa-play-circle');
         startBtn.classList.remove('active');
         
         // Update status indicator
-        statusIndicator.textContent = 'Inactive';
+        statusIndicator.textContent = 'Manual Mode';
         statusIndicator.classList.remove('active');
         statusDot.classList.remove('active');
+        
+        // Remove active class from emotion cards
+        document.querySelectorAll('.emotion-card, .emotion-pill').forEach(el => {
+            el.classList.remove('auto-mode');
+        });
+        
+        // Remove helper text
+        const notice = document.querySelector('.auto-mode-notice');
+        if (notice) {
+            notice.remove();
+        }
         
         // Clear the interval
         clearInterval(emotionDetectionInterval);
@@ -199,7 +231,7 @@ function updateLanguageToggle(language) {
     }
 }
 
-// Detect emotion and get music recommendation
+// Automatic emotion detection with server
 function detectEmotion() {
     console.log('Detecting emotion...');
     
@@ -227,19 +259,66 @@ function detectEmotion() {
     });
 }
 
-// Create a visual effect when selecting emotions in the UI
-function animateEmotionSelection(emotion) {
-    // Simplified effect for better performance
-    const overlay = document.querySelector('.webcam-overlay');
-    if (overlay) {
-        overlay.style.boxShadow = 'inset 0 0 10px rgba(140, 82, 255, 0.6)';
+// Set emotion manually when user clicks an emotion
+function setEmotionManually(emotion) {
+    console.log('Manually setting emotion to:', emotion);
+    
+    // Flash effect on selected emotion card
+    highlightSelectedEmotion(emotion);
+    
+    // Send to server
+    fetch('/set_emotion', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+            emotion: emotion,
+            language: languageToggle
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Emotion set manually:', data);
+        
+        // Update emotion display
+        updateEmotionDisplay(data.emotion);
+        
+        // Display recommended song
+        if (data.song) {
+            displaySong(data.song);
+        }
+    })
+    .catch(error => {
+        console.error('Error setting emotion:', error);
+    });
+}
+
+// Highlight the selected emotion with a visual effect
+function highlightSelectedEmotion(emotion) {
+    // Find the emotion card
+    const emotionCard = document.querySelector(`.emotion-card.${emotion}`);
+    if (emotionCard) {
+        // Add pulse effect
+        emotionCard.classList.add('selected-pulse');
+        
+        // Remove after animation completes
         setTimeout(() => {
-            overlay.style.boxShadow = 'none';
-        }, 200);
+            emotionCard.classList.remove('selected-pulse');
+        }, 1000);
     }
     
-    // Update emoji bubble with the selected emotion
-    updateEmotionBubble(emotion);
+    // Find the pill too
+    const emotionPill = document.querySelector(`.emotion-pill[data-emotion="${emotion}"]`);
+    if (emotionPill) {
+        // Add pulse effect
+        emotionPill.classList.add('selected-pulse');
+        
+        // Remove after animation completes
+        setTimeout(() => {
+            emotionPill.classList.remove('selected-pulse');
+        }, 1000);
+    }
 }
 
 // Update emotion display in UI
@@ -247,7 +326,7 @@ function updateEmotionDisplay(emotion) {
     // Update the main emotion display
     const capitalizedEmotion = emotion.charAt(0).toUpperCase() + emotion.slice(1);
     
-    // Update text elements - simplifying to improve performance
+    // Update text elements
     document.getElementById('detected-emotion').textContent = capitalizedEmotion;
     document.getElementById('detected-emotion-header').textContent = capitalizedEmotion;
     document.getElementById('track-emotion-tag').textContent = capitalizedEmotion;
@@ -261,11 +340,11 @@ function updateEmotionDisplay(emotion) {
         emotionIcon.classList.add(`${emotion.toLowerCase()}-icon`);
     }
     
-    // Update emotion bubble
+    // Set the appropriate icon in the emotion bubble
     updateEmotionBubble(emotion);
 }
 
-// Update the emotion bubble overlay on the webcam
+// Update the emotion bubble if it exists
 function updateEmotionBubble(emotion) {
     const emotionBubble = document.getElementById('emotion-bubble');
     const emotionBubbleText = document.getElementById('emotion-bubble-text');
@@ -323,7 +402,7 @@ function displaySong(song) {
     const emotionTag = document.getElementById('track-emotion-tag');
     
     if (songTitle && songArtist) {
-        // Simplified animation
+        // Update song info
         songTitle.textContent = song.title;
         songArtist.textContent = song.artist;
     }
@@ -333,7 +412,7 @@ function displaySong(song) {
         emotionTag.textContent = languageToggle.charAt(0).toUpperCase() + languageToggle.slice(1);
     }
     
-    // Update the YouTube player - simplified for better performance
+    // Update the YouTube player
     if (playerContainer && song.youtube_id) {
         // Create a placeholder before the real player loads
         playerContainer.innerHTML = '<div class="player-loading"><div class="loading-spinner"></div><p>Loading music...</p></div>';
@@ -357,7 +436,7 @@ function displaySong(song) {
     }
 }
 
-// Add simpler CSS animations
+// Add custom styles for the manual emotion selection
 const style = document.createElement('style');
 style.textContent = `
 .loading-spinner {
@@ -382,6 +461,63 @@ style.textContent = `
     justify-content: center;
     height: 100%;
     color: var(--text-secondary);
+}
+
+.emotion-card, .emotion-pill {
+    cursor: pointer;
+    position: relative;
+}
+
+.emotion-card:hover, .emotion-pill:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.emotion-card.auto-mode, .emotion-pill.auto-mode {
+    opacity: 0.8;
+}
+
+.emotion-card.auto-mode:after, .emotion-pill.auto-mode:after {
+    content: 'Click to select';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.7);
+    padding: 3px 8px;
+    border-radius: 8px;
+    font-size: 10px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.emotion-card.auto-mode:hover:after, .emotion-pill.auto-mode:hover:after {
+    opacity: 1;
+}
+
+.selected-pulse {
+    animation: pulse-select 1s;
+}
+
+@keyframes pulse-select {
+    0% {
+        box-shadow: 0 0 0 0 rgba(140, 82, 255, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 15px rgba(140, 82, 255, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(140, 82, 255, 0);
+    }
+}
+
+.auto-mode-notice {
+    background-color: rgba(140, 82, 255, 0.1);
+    border-left: 3px solid var(--primary-color);
+    padding: 8px 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    font-size: 0.9rem;
 }
 `;
 document.head.appendChild(style);
