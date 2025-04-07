@@ -419,9 +419,10 @@ function displaySong(song) {
         
         // After a slight delay, create the real player
         setTimeout(() => {
-            // Create new iframe for YouTube player
+            // Create new iframe for YouTube player with error handling
             const iframe = document.createElement('iframe');
-            iframe.src = `https://www.youtube.com/embed/${song.youtube_id}?autoplay=1`;
+            iframe.id = 'youtube-iframe';
+            iframe.src = `https://www.youtube.com/embed/${song.youtube_id}?autoplay=1&enablejsapi=1`;
             iframe.style.width = '100%';
             iframe.style.height = '100%';
             iframe.style.borderRadius = '15px';
@@ -429,9 +430,35 @@ function displaySong(song) {
             iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
             iframe.allowFullscreen = true;
             
-            // Clear the container and add the iframe
+            // Create fallback message for unavailable videos
+            const fallbackDiv = document.createElement('div');
+            fallbackDiv.id = 'video-error';
+            fallbackDiv.className = 'd-none alert alert-warning mt-2 p-2 text-center';
+            fallbackDiv.textContent = 'Video unavailable. Try another emotion.';
+            
+            // Clear the container and add the iframe and fallback message
             playerContainer.innerHTML = '';
             playerContainer.appendChild(iframe);
+            playerContainer.appendChild(fallbackDiv);
+            
+            // Add error handling for iframe loading issues
+            iframe.onerror = function() {
+                document.getElementById('video-error').classList.remove('d-none');
+            };
+            
+            // Check if video loads correctly after a delay
+            setTimeout(() => {
+                try {
+                    if (iframe.contentDocument) {
+                        // If we can access contentDocument, it likely means 
+                        // there's a same-origin policy error or the video doesn't exist
+                        document.getElementById('video-error').classList.remove('d-none');
+                    }
+                } catch (e) {
+                    // Error accessing iframe content is expected and means it loaded from YouTube
+                    // This is normal behavior
+                }
+            }, 3000);
         }, 800);
     }
 }
@@ -457,67 +484,47 @@ style.textContent = `
 .player-loading {
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     height: 100%;
-    color: var(--text-secondary);
+    width: 100%;
+    color: var(--text-color);
+    background: var(--card-bg);
+    border-radius: 15px;
+    padding: 20px;
 }
 
-.emotion-card, .emotion-pill {
-    cursor: pointer;
-    position: relative;
+.emotion-card.selected-pulse {
+    animation: pulse 1s ease-in-out;
 }
 
-.emotion-card:hover, .emotion-pill:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+.emotion-pill.selected-pulse {
+    animation: pulse 1s ease-in-out;
 }
 
-.emotion-card.auto-mode, .emotion-pill.auto-mode {
-    opacity: 0.8;
+@keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.7); }
+    50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(var(--primary-rgb), 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0); }
 }
 
-.emotion-card.auto-mode:after, .emotion-pill.auto-mode:after {
-    content: 'Click to select';
-    position: absolute;
-    bottom: -5px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.7);
-    padding: 3px 8px;
-    border-radius: 8px;
-    font-size: 10px;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.emotion-card.auto-mode:hover:after, .emotion-pill.auto-mode:hover:after {
-    opacity: 1;
-}
-
-.selected-pulse {
-    animation: pulse-select 1s;
-}
-
-@keyframes pulse-select {
-    0% {
-        box-shadow: 0 0 0 0 rgba(140, 82, 255, 0.7);
-    }
-    70% {
-        box-shadow: 0 0 0 15px rgba(140, 82, 255, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(140, 82, 255, 0);
-    }
+.emotion-card.auto-mode {
+    border: 3px solid rgba(var(--primary-rgb), 0.3);
 }
 
 .auto-mode-notice {
-    background-color: rgba(140, 82, 255, 0.1);
-    border-left: 3px solid var(--primary-color);
-    padding: 8px 15px;
-    margin-bottom: 15px;
-    border-radius: 5px;
+    margin-bottom: 20px;
+    padding: 10px;
+    background: rgba(var(--primary-rgb), 0.1);
+    color: var(--text-color);
+    border-radius: 10px;
+    text-align: center;
+}
+
+.auto-mode-notice p {
+    margin: 0;
     font-size: 0.9rem;
 }
 `;
+
 document.head.appendChild(style);
