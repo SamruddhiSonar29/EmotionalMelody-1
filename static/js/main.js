@@ -301,8 +301,11 @@ function setEmotionManually(emotion) {
         // Update emotion display
         updateEmotionDisplay(data.emotion);
         
-        // Display recommended song
-        if (data.song) {
+        // Display recommended songs
+        if (data.songs && data.songs.length > 0) {
+            displaySongList(data.songs);
+        } else if (data.song) {
+            // For backward compatibility
             displaySong(data.song);
         }
     })
@@ -480,7 +483,232 @@ function displaySong(song) {
     }
 }
 
-// Add custom styles for the manual emotion selection
+// Display a list of song recommendations
+function displaySongList(songs) {
+    if (!songs || songs.length === 0) {
+        console.error('No songs provided to displaySongList');
+        return;
+    }
+    
+    // Get container for song list
+    const musicBody = document.querySelector('.music-body');
+    if (!musicBody) {
+        console.error('Music body container not found');
+        return;
+    }
+    
+    // Create song list container if it doesn't exist yet
+    let songListContainer = document.getElementById('song-list-container');
+    if (!songListContainer) {
+        songListContainer = document.createElement('div');
+        songListContainer.id = 'song-list-container';
+        songListContainer.className = 'song-list-container mb-3';
+        
+        // Add it after the current track info
+        const currentTrack = musicBody.querySelector('.current-track');
+        if (currentTrack) {
+            currentTrack.after(songListContainer);
+        } else {
+            // If current track container doesn't exist, prepend to music body
+            musicBody.prepend(songListContainer);
+        }
+    }
+    
+    // Update the songListContainer with the list of songs
+    let songListHTML = `
+        <h4 class="songs-header">Recommended Songs <span class="badge bg-primary">${songs.length}</span></h4>
+        <div class="list-group song-list">
+    `;
+    
+    // Add each song to the list
+    songs.forEach((song, index) => {
+        songListHTML += `
+            <button class="list-group-item list-group-item-action song-item" data-index="${index}">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">${song.title}</h5>
+                        <p class="mb-1 text-muted">${song.artist}</p>
+                    </div>
+                    <span class="play-icon">
+                        <i class="fas fa-play-circle"></i>
+                    </span>
+                </div>
+            </button>
+        `;
+    });
+    
+    songListHTML += '</div>';
+    songListContainer.innerHTML = songListHTML;
+    
+    // Add click event listeners to each song item
+    const songItems = songListContainer.querySelectorAll('.song-item');
+    songItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const index = parseInt(this.getAttribute('data-index'));
+            displaySong(songs[index]);
+            
+            // Remove active class from all songs and add to selected one
+            songItems.forEach(el => el.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+    
+    // Display the first song by default
+    displaySong(songs[0]);
+    if (songItems.length > 0) {
+        songItems[0].classList.add('active');
+    }
+}
+
+// Global variables for webcam
+let videoElement;
+let canvasElement;
+let canvasContext;
+let isWebcamActive = false;
+
+// Initialize webcam elements
+function initializeWebcam() {
+    // Set up webcam elements
+    videoElement = document.getElementById('webcam-video');
+    canvasElement = document.getElementById('canvas');
+    
+    if (!videoElement || !canvasElement) {
+        // Create webcam elements if they don't exist
+        const webcamContainer = document.querySelector('.webcam-container');
+        if (!webcamContainer) {
+            console.error('Webcam container not found');
+            return;
+        }
+        
+        // Add webcam video element
+        if (!videoElement) {
+            videoElement = document.createElement('video');
+            videoElement.id = 'webcam-video';
+            videoElement.className = 'webcam-feed d-none';
+            videoElement.setAttribute('autoplay', 'true');
+            videoElement.setAttribute('playsinline', 'true');
+            webcamContainer.appendChild(videoElement);
+        }
+        
+        // Add canvas for processing
+        if (!canvasElement) {
+            canvasElement = document.createElement('canvas');
+            canvasElement.id = 'canvas';
+            canvasElement.width = 640;
+            canvasElement.height = 480;
+            canvasElement.style.display = 'none';
+            webcamContainer.appendChild(canvasElement);
+        }
+    }
+    
+    // Set up canvas context
+    canvasContext = canvasElement.getContext('2d');
+    
+    // Add webcam toggle button if it doesn't exist
+    let webcamToggleBtn = document.getElementById('webcam-toggle');
+    if (!webcamToggleBtn) {
+        const controlsContainer = document.querySelector('.controls-container');
+        if (controlsContainer) {
+            webcamToggleBtn = document.createElement('button');
+            webcamToggleBtn.id = 'webcam-toggle';
+            webcamToggleBtn.className = 'btn detection-btn mt-3';
+            webcamToggleBtn.innerHTML = `
+                <div class="btn-content">
+                    <i class="fas fa-camera me-2"></i>
+                    <span>Turn On Camera</span>
+                </div>
+                <div class="btn-hover-effect"></div>
+            `;
+            controlsContainer.appendChild(webcamToggleBtn);
+            
+            // Add event listener
+            webcamToggleBtn.addEventListener('click', toggleWebcam);
+        }
+    }
+}
+
+// Toggle webcam on/off
+function toggleWebcam() {
+    const webcamToggleBtn = document.getElementById('webcam-toggle');
+    const webcamPlaceholder = document.querySelector('.webcam-feed:not(#webcam-video)');
+    
+    if (!isWebcamActive) {
+        // Start webcam
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+                videoElement.srcObject = stream;
+                videoElement.play();
+                isWebcamActive = true;
+                
+                // Show webcam feed and hide placeholder
+                videoElement.classList.remove('d-none');
+                if (webcamPlaceholder) {
+                    webcamPlaceholder.classList.add('d-none');
+                }
+                
+                // Update button text
+                if (webcamToggleBtn) {
+                    webcamToggleBtn.querySelector('span').textContent = 'Turn Off Camera';
+                    webcamToggleBtn.querySelector('i').classList.remove('fa-camera');
+                    webcamToggleBtn.querySelector('i').classList.add('fa-camera-slash');
+                }
+                
+                // Update bubble text
+                const emotionBubble = document.getElementById('emotion-bubble');
+                if (emotionBubble) {
+                    emotionBubble.innerHTML = `
+                        <i class="fas fa-spinner fa-spin emotion-bubble-icon"></i>
+                        <span class="emotion-bubble-text">Detecting...</span>
+                    `;
+                }
+                
+                // Start emotion detection from webcam
+                if (emotionDetectionInterval) {
+                    clearInterval(emotionDetectionInterval);
+                }
+                emotionDetectionInterval = setInterval(detectEmotion, 3000);
+                detectEmotion(); // Initial detection
+            })
+            .catch(function(err) {
+                console.error("Error accessing webcam: ", err);
+                alert("Could not access webcam. Please check permissions.");
+            });
+    } else {
+        // Stop webcam
+        const stream = videoElement.srcObject;
+        if (stream) {
+            const tracks = stream.getTracks();
+            tracks.forEach(track => track.stop());
+            videoElement.srcObject = null;
+        }
+        
+        isWebcamActive = false;
+        
+        // Hide webcam feed and show placeholder
+        videoElement.classList.add('d-none');
+        if (webcamPlaceholder) {
+            webcamPlaceholder.classList.remove('d-none');
+        }
+        
+        // Update button text
+        if (webcamToggleBtn) {
+            webcamToggleBtn.querySelector('span').textContent = 'Turn On Camera';
+            webcamToggleBtn.querySelector('i').classList.remove('fa-camera-slash');
+            webcamToggleBtn.querySelector('i').classList.add('fa-camera');
+        }
+        
+        // Reset bubble
+        const emotionBubble = document.getElementById('emotion-bubble');
+        if (emotionBubble) {
+            emotionBubble.innerHTML = `
+                <i class="fas fa-smile emotion-bubble-icon"></i>
+                <span class="emotion-bubble-text" id="emotion-bubble-text">Neutral</span>
+            `;
+        }
+    }
+}
+
+// Add custom styles for the song list and webcam features
 const style = document.createElement('style');
 style.textContent = `
 .loading-spinner {
@@ -542,6 +770,83 @@ style.textContent = `
     margin: 0;
     font-size: 0.9rem;
 }
+
+/* Song list styles */
+.song-list-container {
+    margin-top: 1rem;
+    border-radius: 15px;
+    overflow: hidden;
+    background-color: rgba(var(--card-bg-rgb), 0.6);
+}
+
+.songs-header {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 1.1rem;
+    margin-bottom: 0;
+}
+
+.song-list {
+    max-height: 250px;
+    overflow-y: auto;
+    border-radius: 0 0 15px 15px;
+}
+
+.song-item {
+    background-color: transparent;
+    border-color: rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.song-item:hover {
+    background-color: rgba(var(--primary-rgb), 0.1);
+}
+
+.song-item.active {
+    background-color: rgba(var(--primary-rgb), 0.2);
+    border-left: 3px solid var(--primary-color);
+}
+
+.play-icon {
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+    font-size: 1.2rem;
+}
+
+.song-item:hover .play-icon,
+.song-item.active .play-icon {
+    opacity: 1;
+}
+
+/* Webcam styles */
+#webcam-video {
+    width: 100%;
+    height: auto;
+    border-radius: 15px;
+    object-fit: cover;
+}
+
+#webcam-toggle {
+    width: 100%;
+    margin-top: 0.5rem;
+}
 `;
 
 document.head.appendChild(style);
+
+// Add the initialization for webcam when the app loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Document loaded, initializing application...');
+    
+    // Initialize app and emotion selection
+    initializeApp();
+    
+    // Setup event listeners
+    setupEventListeners();
+    
+    // Initialize webcam components
+    initializeWebcam();
+    
+    // Start animation loop for UI elements
+    requestAnimationFrame(animateUI);
+});

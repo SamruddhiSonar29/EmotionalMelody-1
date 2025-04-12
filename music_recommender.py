@@ -46,13 +46,15 @@ class MusicRecommender:
                     {"title": "Happy", "artist": "Pharrell Williams", "youtube_id": "ZbZSe6N_BXs"},
                     {"title": "Can't Stop the Feeling", "artist": "Justin Timberlake", "youtube_id": "ru0K8uYEZWw"},
                     {"title": "Uptown Funk", "artist": "Mark Ronson ft. Bruno Mars", "youtube_id": "OPf0YbXqDm0"},
-                    {"title": "Walking on Sunshine", "artist": "Katrina and The Waves", "youtube_id": "iPUmE-tne5U"}
+                    {"title": "Walking on Sunshine", "artist": "Katrina and The Waves", "youtube_id": "iPUmE-tne5U"},
+                    {"title": "Good Feeling", "artist": "Flo Rida", "youtube_id": "3OnnDqH6Wj8"}
                 ],
                 "hindi": [
                     {"title": "Badtameez Dil", "artist": "Benny Dayal", "youtube_id": "II2EO3Nw4m0"},
                     {"title": "Nagada Sang Dhol", "artist": "Shreya Ghoshal", "youtube_id": "X0peZpC8hx0"},
                     {"title": "London Thumakda", "artist": "Labh Janjua", "youtube_id": "udra42JzgAM"},
-                    {"title": "Dil Dhadakne Do", "artist": "Priyanka Chopra", "youtube_id": "WvLT_L4pHxI"}
+                    {"title": "Dil Dhadakne Do", "artist": "Priyanka Chopra", "youtube_id": "WvLT_L4pHxI"},
+                    {"title": "Badri Ki Dulhania", "artist": "Neha Kakkar", "youtube_id": "1YBl3Zbt80A"}
                 ]
             },
             "sad": {
@@ -60,13 +62,15 @@ class MusicRecommender:
                     {"title": "Someone Like You", "artist": "Adele", "youtube_id": "hLQl3WQQoQ0"},
                     {"title": "Fix You", "artist": "Coldplay", "youtube_id": "k4V3Mo61fJM"},
                     {"title": "Let Her Go", "artist": "Passenger", "youtube_id": "RBumgq5yVrA"},
-                    {"title": "All I Want", "artist": "Kodaline", "youtube_id": "mtf7hC17IBM"}
+                    {"title": "All I Want", "artist": "Kodaline", "youtube_id": "mtf7hC17IBM"},
+                    {"title": "Heather", "artist": "Conan Gray", "youtube_id": "24u3NoPvgMw"}
                 ],
                 "hindi": [
                     {"title": "Channa Mereya", "artist": "Arijit Singh", "youtube_id": "284Ov7ysmfA"},
                     {"title": "Tum Hi Ho", "artist": "Arijit Singh", "youtube_id": "Umqb9KENgmk"},
                     {"title": "Luka Chuppi", "artist": "A.R. Rahman", "youtube_id": "HcOc_eUpBbY"},
-                    {"title": "Agar Tum Saath Ho", "artist": "Arijit Singh", "youtube_id": "sK7riqg2mr4"}
+                    {"title": "Agar Tum Saath Ho", "artist": "Arijit Singh", "youtube_id": "sK7riqg2mr4"},
+                    {"title": "Kalank", "artist": "Arijit Singh", "youtube_id": "Grr0FlC8SQA"}
                 ]
             },
             "angry": {
@@ -74,13 +78,15 @@ class MusicRecommender:
                     {"title": "Numb", "artist": "Linkin Park", "youtube_id": "kXYiU_JCYtU"},
                     {"title": "Enter Sandman", "artist": "Metallica", "youtube_id": "CD-E-LDc384"},
                     {"title": "Toxicity", "artist": "System of a Down", "youtube_id": "iywaBOMvYLI"},
-                    {"title": "In The End", "artist": "Linkin Park", "youtube_id": "eVTXPUF4Oz4"}
+                    {"title": "In The End", "artist": "Linkin Park", "youtube_id": "eVTXPUF4Oz4"},
+                    {"title": "Break Stuff", "artist": "Limp Bizkit", "youtube_id": "ZpUYjpKg9KY"}
                 ],
                 "hindi": [
                     {"title": "Jee Karda", "artist": "Divya Kumar", "youtube_id": "LFDXHsiwTVc"},
                     {"title": "Bhag Bhag DK Bose", "artist": "Ram Sampath", "youtube_id": "IQEDu8SPHao"},
                     {"title": "Chhu Kar Mere Man Ko", "artist": "Yesudas", "youtube_id": "fGJXXPI9hU0"},
-                    {"title": "Sadda Haq", "artist": "Mohit Chauhan", "youtube_id": "p9DQINKZxWE"}
+                    {"title": "Sadda Haq", "artist": "Mohit Chauhan", "youtube_id": "p9DQINKZxWE"},
+                    {"title": "Jagga Jiteya", "artist": "Daler Mehndi", "youtube_id": "E0aw-gCdels"}
                 ]
             },
             "neutral": {
@@ -88,13 +94,15 @@ class MusicRecommender:
                     {"title": "Perfect", "artist": "Ed Sheeran", "youtube_id": "2Vv-BfVoq4g"},
                     {"title": "Someone You Loved", "artist": "Lewis Capaldi", "youtube_id": "zABLecsR5UE"},
                     {"title": "Shallow", "artist": "Lady Gaga, Bradley Cooper", "youtube_id": "bo_efYhYU2A"},
-                    {"title": "Say You Won't Let Go", "artist": "James Arthur", "youtube_id": "0yW7w8F2TVA"}
+                    {"title": "Say You Won't Let Go", "artist": "James Arthur", "youtube_id": "0yW7w8F2TVA"},
+                    {"title": "Thinking Out Loud", "artist": "Ed Sheeran", "youtube_id": "lp-EO5I60KA"}
                 ],
                 "hindi": [
                     {"title": "Iktara", "artist": "Amit Trivedi", "youtube_id": "fSS_R91Nimw"},
                     {"title": "Tum Se Hi", "artist": "Mohit Chauhan", "youtube_id": "NXmN-Y2YeeI"},
                     {"title": "Kun Faya Kun", "artist": "A.R. Rahman", "youtube_id": "T94PHkuydcw"},
-                    {"title": "Kabira", "artist": "Arijit Singh", "youtube_id": "jHNNMj5bNQw"}
+                    {"title": "Kabira", "artist": "Arijit Singh", "youtube_id": "jHNNMj5bNQw"},
+                    {"title": "Ae Dil Hai Mushkil", "artist": "Arijit Singh", "youtube_id": "6FURuLYrR_Q"}
                 ]
             },
             "surprise": {
@@ -102,13 +110,15 @@ class MusicRecommender:
                     {"title": "What Makes You Beautiful", "artist": "One Direction", "youtube_id": "QJO3ROT-A4E"},
                     {"title": "Shape of You", "artist": "Ed Sheeran", "youtube_id": "JGwWNGJdvx8"},
                     {"title": "Don't Stop Believin'", "artist": "Journey", "youtube_id": "1k8craCGpgs"},
-                    {"title": "I Gotta Feeling", "artist": "Black Eyed Peas", "youtube_id": "uSD4vsh1zDA"}
+                    {"title": "I Gotta Feeling", "artist": "Black Eyed Peas", "youtube_id": "uSD4vsh1zDA"},
+                    {"title": "Sugar", "artist": "Maroon 5", "youtube_id": "09R8_2nJtjg"}
                 ],
                 "hindi": [
                     {"title": "Koi Mil Gaya", "artist": "Udit Narayan", "youtube_id": "lV4EGG2CwIQ"},
                     {"title": "Deewangi Deewangi", "artist": "Shaan", "youtube_id": "2eJTxiKrhQI"},
                     {"title": "Jumme Ki Raat", "artist": "Mika Singh", "youtube_id": "jY8WN1m4VVU"},
-                    {"title": "It's The Time To Disco", "artist": "KK", "youtube_id": "_5mJAGXCiYQ"}
+                    {"title": "It's The Time To Disco", "artist": "KK", "youtube_id": "_5mJAGXCiYQ"},
+                    {"title": "Dhoom Machale", "artist": "Sunidhi Chauhan", "youtube_id": "ymfLJoJH2Y4"}
                 ]
             },
             "fear": {
@@ -116,13 +126,15 @@ class MusicRecommender:
                     {"title": "Breathe Me", "artist": "Sia", "youtube_id": "SFGvmrJ5rjM"},
                     {"title": "Everybody's Changing", "artist": "Keane", "youtube_id": "RSNmgE6L8AU"},
                     {"title": "Fix You", "artist": "Coldplay", "youtube_id": "k4V3Mo61fJM"},
-                    {"title": "Skinny Love", "artist": "Birdy", "youtube_id": "aNzCDt2eidg"}
+                    {"title": "Skinny Love", "artist": "Birdy", "youtube_id": "aNzCDt2eidg"},
+                    {"title": "Hurt", "artist": "Johnny Cash", "youtube_id": "8AHCfZTRGiI"}
                 ],
                 "hindi": [
                     {"title": "Darkhast", "artist": "Arijit Singh", "youtube_id": "0zAFpUriLRE"},
                     {"title": "Phir Le Aya Dil", "artist": "Arijit Singh", "youtube_id": "2jRATDHoHBQ"},
                     {"title": "Abhi Mujh Mein Kahin", "artist": "Sonu Nigam", "youtube_id": "oWKgpB2zpgw"},
-                    {"title": "Zinda", "artist": "Amit Trivedi", "youtube_id": "cgHLvt0rxVs"}
+                    {"title": "Zinda", "artist": "Amit Trivedi", "youtube_id": "cgHLvt0rxVs"},
+                    {"title": "Lae Dooba", "artist": "Sunidhi Chauhan", "youtube_id": "lfzYU9b1Mcw"}
                 ]
             },
             "disgust": {
@@ -130,13 +142,15 @@ class MusicRecommender:
                     {"title": "Stronger", "artist": "Kelly Clarkson", "youtube_id": "Xn676-fLq7I"},
                     {"title": "Fighter", "artist": "Christina Aguilera", "youtube_id": "PstrAfoMKlc"},
                     {"title": "So What", "artist": "P!nk", "youtube_id": "FJfFZqTlWrQ"},
-                    {"title": "I Don't Care", "artist": "Ed Sheeran & Justin Bieber", "youtube_id": "CCSGelSCPGE"}
+                    {"title": "I Don't Care", "artist": "Ed Sheeran & Justin Bieber", "youtube_id": "CCSGelSCPGE"},
+                    {"title": "Forget You", "artist": "CeeLo Green", "youtube_id": "bKxodgpyGec"}
                 ],
                 "hindi": [
                     {"title": "Beech Beech Mein", "artist": "Arijit Singh", "youtube_id": "ePTNDJUCz-o"},
                     {"title": "Gulaabo", "artist": "Vishal Dadlani", "youtube_id": "bVb1BUG22Lc"},
                     {"title": "Tarefan", "artist": "Badshah", "youtube_id": "crttU0yyZ4w"},
-                    {"title": "Ud-daa Punjab", "artist": "Amit Trivedi", "youtube_id": "QzfsGxrCD4o"}
+                    {"title": "Ud-daa Punjab", "artist": "Amit Trivedi", "youtube_id": "QzfsGxrCD4o"},
+                    {"title": "Laila Main Laila", "artist": "Pawni Pandey", "youtube_id": "9d8SzG4FPyM"}
                 ]
             }
         }
