@@ -144,7 +144,22 @@ class MusicRecommender:
         return library
 
     def recommend_song(self, emotion, language='english'):
-        """Recommend a song based on detected emotion and language preference"""
+        """Recommend a single song based on detected emotion and language preference"""
+        songs = self.recommend_songs(emotion, language, count=1)
+        if songs and len(songs) > 0:
+            return songs[0]
+        else:
+            # Return a default song if there's an error
+            return {
+                'title': "Happy",
+                'artist': "Pharrell Williams",
+                'youtube_id': "ZbZSe6N_BXs",
+                'emotion': "neutral",
+                'language': language.lower()
+            }
+    
+    def recommend_songs(self, emotion, language='english', count=5):
+        """Recommend multiple songs based on detected emotion and language preference"""
         # Map similar emotions if not directly found in the library
         emotion_map = {
             "angry": "angry",
@@ -165,25 +180,33 @@ class MusicRecommender:
         
         try:
             # Get songs for the emotion and language
-            songs = self.music_library[mapped_emotion][language.lower()]
+            available_songs = self.music_library[mapped_emotion][language.lower()]
             
-            # Randomly select a song
-            selected_song = random.choice(songs)
+            # Return up to 'count' songs (or shuffle and return all if fewer are available)
+            songs_to_return = []
+            if len(available_songs) <= count:
+                # If we have fewer songs than requested, shuffle and return all of them
+                shuffled_songs = available_songs.copy()
+                random.shuffle(shuffled_songs)
+                songs_to_return = shuffled_songs
+            else:
+                # Otherwise, select random 'count' songs without duplicates
+                songs_to_return = random.sample(available_songs, count)
             
-            return {
-                'title': selected_song['title'],
-                'artist': selected_song['artist'],
-                'youtube_id': selected_song['youtube_id'],
-                'emotion': mapped_emotion,
-                'language': language.lower()
-            }
+            # Format each song with additional info
+            formatted_songs = []
+            for song in songs_to_return:
+                formatted_songs.append({
+                    'title': song['title'],
+                    'artist': song['artist'],
+                    'youtube_id': song['youtube_id'],
+                    'emotion': mapped_emotion,
+                    'language': language.lower()
+                })
+            
+            return formatted_songs
+            
         except (KeyError, IndexError) as e:
-            logger.error(f"Error recommending song: {e}")
-            # Return a default song if there's an error
-            return {
-                'title': "Happy",
-                'artist': "Pharrell Williams",
-                'youtube_id': "ZbZSe6N_BXs",
-                'emotion': "neutral",
-                'language': language.lower()
-            }
+            logger.error(f"Error recommending songs: {e}")
+            # Return empty list if there's an error
+            return []

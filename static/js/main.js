@@ -235,12 +235,26 @@ function updateLanguageToggle(language) {
 function detectEmotion() {
     console.log('Detecting emotion...');
     
+    // Get webcam frame if it's available
+    let frameData = null;
+    const canvasElement = document.getElementById('canvas');
+    if (canvasElement && isWebcamActive) {
+        try {
+            frameData = canvasElement.toDataURL('image/jpeg');
+        } catch (e) {
+            console.error('Error capturing webcam frame:', e);
+        }
+    }
+    
     fetch('/detect_emotion', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ language: languageToggle })
+        body: JSON.stringify({ 
+            language: languageToggle,
+            frame: frameData
+        })
     })
     .then(response => response.json())
     .then(data => {
@@ -249,8 +263,11 @@ function detectEmotion() {
         // Update emotion display
         updateEmotionDisplay(data.emotion);
         
-        // Display recommended song
-        if (data.song) {
+        // Display recommended songs
+        if (data.songs && data.songs.length > 0) {
+            displaySongList(data.songs);
+        } else if (data.song) {
+            // For backward compatibility
             displaySong(data.song);
         }
     })
