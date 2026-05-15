@@ -9,7 +9,7 @@
     --text-secondary: #b0b3b8;
     --error-color: #e74c3c;
     --success-color: #2ecc71;
-    --shadow-color: rgba(0, 0, 0, 0.3);
+    --shadow-color: rgba(247, 243, 243, 0.938);
     --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     
     /* Emotion Colors */
